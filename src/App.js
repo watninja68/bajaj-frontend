@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const API_URL = 'http://127.0.0.1:5000/bfhl';
+const API_URL = 'https://bajaj-backend-eqd9.onrender.com/bfhl';
 
 const App = () => {
   const [inputData, setInputData] = useState('');
