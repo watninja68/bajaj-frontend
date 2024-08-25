@@ -1,4 +1,4 @@
-import React, { useState  } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 const API_URL = 'https://bajaj-backend-eqd9.onrender.com/bfhl';
@@ -7,9 +7,22 @@ const App = () => {
   const [inputData, setInputData] = useState('');
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedFields, setSelectedFields] = useState({
+    is_success: true,
+    user_id: true,
+    email: true,
+    roll_number: true,
+    numbers: true,
+    alphabets: true,
+    highest_lowecase_alphabet: true
+  });
 
   const handleInputChange = (e) => {
     setInputData(e.target.value);
+  };
+
+  const handleFieldChange = (field) => {
+    setSelectedFields(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
   const handleSubmit = async (e) => {
@@ -18,7 +31,6 @@ const App = () => {
     setResponse(null);
 
     try {
-      // Validate if the input can be converted into a valid JSON array
       const dataArray = inputData.split(',').map(item => item.trim());
       if (!Array.isArray(dataArray) || dataArray.some(item => item === '')) {
         throw new Error('Invalid input format. Please enter valid JSON.');
@@ -81,6 +93,20 @@ const App = () => {
         <button onClick={handleGetRequest}>Send GET Request</button>
       </div>
 
+      <div className="card">
+        <h2>Select Fields to Display</h2>
+        {Object.keys(selectedFields).map(field => (
+          <label key={field}>
+            <input
+              type="checkbox"
+              checked={selectedFields[field]}
+              onChange={() => handleFieldChange(field)}
+            />
+            {field}
+          </label>
+        ))}
+      </div>
+
       {error && (
         <div className="alert error">
           <h3>Error</h3>
@@ -91,7 +117,15 @@ const App = () => {
       {response && (
         <div className="card">
           <h2>Response</h2>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
+          <pre>
+            {JSON.stringify(
+              Object.fromEntries(
+                Object.entries(response).filter(([key]) => selectedFields[key])
+              ),
+              null,
+              2
+            )}
+          </pre>
         </div>
       )}
     </div>
