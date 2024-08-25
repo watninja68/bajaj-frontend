@@ -16,6 +16,7 @@ const App = () => {
     alphabets: true,
     highest_lowecase_alphabet: true
   });
+  const [requestType, setRequestType] = useState(null);
 
   const handleInputChange = (e) => {
     setInputData(e.target.value);
@@ -29,6 +30,7 @@ const App = () => {
     e.preventDefault();
     setError(null);
     setResponse(null);
+    setRequestType('POST');
 
     try {
       const dataArray = inputData.split(',').map(item => item.trim());
@@ -58,6 +60,7 @@ const App = () => {
   const handleGetRequest = async () => {
     setError(null);
     setResponse(null);
+    setRequestType('GET');
 
     try {
       const res = await fetch(API_URL);
@@ -93,19 +96,21 @@ const App = () => {
         <button onClick={handleGetRequest}>Send GET Request</button>
       </div>
 
-      <div className="card">
-        <h2>Select Fields to Display</h2>
-        {Object.keys(selectedFields).map(field => (
-          <label key={field}>
-            <input
-              type="checkbox"
-              checked={selectedFields[field]}
-              onChange={() => handleFieldChange(field)}
-            />
-            {field}
-          </label>
-        ))}
-      </div>
+      {requestType === 'POST' && (
+        <div className="card">
+          <h2>Select Fields to Display (POST response only)</h2>
+          {Object.keys(selectedFields).map(field => (
+            <label key={field}>
+              <input
+                type="checkbox"
+                checked={selectedFields[field]}
+                onChange={() => handleFieldChange(field)}
+              />
+              {field}
+            </label>
+          ))}
+        </div>
+      )}
 
       {error && (
         <div className="alert error">
@@ -118,13 +123,16 @@ const App = () => {
         <div className="card">
           <h2>Response</h2>
           <pre>
-            {JSON.stringify(
-              Object.fromEntries(
-                Object.entries(response).filter(([key]) => selectedFields[key])
-              ),
-              null,
-              2
-            )}
+            {requestType === 'POST'
+              ? JSON.stringify(
+                  Object.fromEntries(
+                    Object.entries(response).filter(([key]) => selectedFields[key])
+                  ),
+                  null,
+                  2
+                )
+              : JSON.stringify(response, null, 2)
+            }
           </pre>
         </div>
       )}
